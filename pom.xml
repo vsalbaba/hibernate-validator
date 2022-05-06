@@ -86,7 +86,7 @@
         <module>test-utils</module>
         <module>build-config</module>
         <module>engine</module>
-        <module>tck-runner</module>
+        <module>modules</module> <!-- adding modules to remove them  -->
         <module>annotation-processor</module>
         <module>performance</module>
     </modules>
