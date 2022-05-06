@@ -86,7 +86,8 @@
         <module>test-utils</module>
         <module>build-config</module>
         <module>engine</module>
-        <module>modules</module> <!-- adding modules to remove them  -->
+        <module>modules</module> <!-- adding modules module for the configurations where they are missing -->
+        <module>integration</module>  <!-- adding integration module to so that no profile can remove it  -->
         <module>annotation-processor</module>
         <module>performance</module>
     </modules>
@@ -229,6 +230,8 @@
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
         <arquillian.wildfly.jvm.args>${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
 
+        <server.jvm.jpms.args>--add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.management/javax.management=ALL-UNNAMED --add-opens=java.naming/javax.naming=ALL-UNNAMED</server.jvm.jpms.args>
+        <client.jvm.jpms.args>--add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.management/javax.management=ALL-UNNAMED --add-opens=java.naming/javax.naming=ALL-UNNAMED</client.jvm.jpms.args>
         <!-- Forbidden API related properties -->
         <forbiddenapis-junit.path>forbidden-junit.txt</forbiddenapis-junit.path>
         <forbiddenapis.jdk.target>10</forbiddenapis.jdk.target>
@@ -439,7 +442,17 @@
                         <groupId>sun.jdk</groupId>
                         <artifactId>jconsole</artifactId>
                     </exclusion>
+<!--                    <exclusion>-->
+<!--                        <groupId>org.wildfly.core</groupId>-->
+<!--                        <artifactId>wildfly-launcher</artifactId>-->
+<!--                    </exclusion>-->
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.core</groupId>
+                <artifactId>wildfly-launcher</artifactId>
+                <version>19.0.0.Beta8</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
@@ -703,7 +716,7 @@
                         <includes>
                             <include>**/*Test.java</include>
                         </includes>
-                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap}</argLine>
+                        <argLine>-Dlauncher.skip.jpms.properties=true ${client.jvm.jpms.args} ${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
                     </configuration>
                 </plugin>
@@ -728,7 +741,7 @@
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>${maven-surefire-plugin.version}</version>
                     <configuration>
-                        <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                        <argLine>-Dlauncher.skip.jpms.properties=true ${client.jvm.jpms.args} ${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap} ${maven-surefire-plugin.argLine.add-opens}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
                     </configuration>
                 </plugin>
@@ -860,7 +873,7 @@
                 <plugin>
                     <groupId>org.codehaus.gmavenplus</groupId>
                     <artifactId>gmavenplus-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>1.13.0</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.codehaus.groovy</groupId>
@@ -1016,7 +1029,7 @@
                                             gmavenplus-plugin
                                         </artifactId>
                                         <versionRange>
-                                            [1.5,)
+                                            [1.13,)
                                         </versionRange>
                                         <goals>
                                             <goal>execute</goal>
@@ -1217,7 +1230,7 @@
                             <artifactId>maven-surefire-plugin</artifactId>
                             <version>${maven-surefire-plugin.version}</version>
                             <configuration>
-                                <argLine>${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap} ${maven-surefire-plugin.argLine.add-opens}</argLine>
+                                <argLine>-Dlauncher.skip.jpms.properties=true ${client.jvm.jpms.args} ${maven-surefire-plugin.argLine} ${maven-surefire-plugin.shrinkwrap} ${maven-surefire-plugin.argLine.add-opens}</argLine>
                             </configuration>
                         </plugin>
                         <plugin>
@@ -1263,11 +1276,6 @@
             <activation>
                 <jdk>[11,)</jdk>
             </activation>
-            <properties>
-                <arquillian.wildfly.jvm.args.add-modules>
-                    --add-modules=java.se
-                </arquillian.wildfly.jvm.args.add-modules>
-            </properties>
             <build>
                 <pluginManagement>
                     <plugins>
@@ -1279,17 +1287,7 @@
                                     --add-opens=java.base/java.lang=ALL-UNNAMED
                                     --add-opens=java.base/java.security=ALL-UNNAMED
                                     --add-opens=java.base/java.io=ALL-UNNAMED
-                                    --add-modules=java.se
                                 </javaOpts>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jboss.as</groupId>
-                            <artifactId>patch-gen-maven-plugin</artifactId>
-                            <configuration>
-                                <argLine>
-                                    --add-modules=java.se
-                                </argLine>
                             </configuration>
                         </plugin>
                     </plugins>
