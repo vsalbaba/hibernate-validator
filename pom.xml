@@ -442,10 +442,10 @@
                         <groupId>sun.jdk</groupId>
                         <artifactId>jconsole</artifactId>
                     </exclusion>
-<!--                    <exclusion>-->
-<!--                        <groupId>org.wildfly.core</groupId>-->
-<!--                        <artifactId>wildfly-launcher</artifactId>-->
-<!--                    </exclusion>-->
+                    <exclusion>
+                        <groupId>org.wildfly.core</groupId>
+                        <artifactId>wildfly-launcher</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
