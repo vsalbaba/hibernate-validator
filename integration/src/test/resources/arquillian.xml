@@ -19,7 +19,7 @@
         <configuration>
             <property name="jbossHome">${wildfly.target-dir}</property>
             <property name="javaVmArguments">
-                -Dee8.preview.mode=true ${arquillian.wildfly.jvm.args}
+                 ${server.jvm.jpms.args}
             </property>
             <!--
             To be injected in javaVmArguments to enable debug mode:
