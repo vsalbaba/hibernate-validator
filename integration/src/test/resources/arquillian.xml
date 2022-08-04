@@ -25,7 +25,7 @@
             <property name="jbossHome">${wildfly.target-dir}</property>
             <!-- Java home is defined through an environment variable (see maven-failsafe-plugin config) -->
             <property name="javaVmArguments">
-                ${arquillian.wildfly.jvm.args}
+                ${server.jvm.jpms.args}
             </property>
             <!--
             To be injected in javaVmArguments to enable debug mode:
