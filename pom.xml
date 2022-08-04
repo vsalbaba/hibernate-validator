@@ -86,7 +86,6 @@
         <module>test-utils</module>
         <module>build-config</module>
         <module>engine</module>
-        <module>tck-runner</module>
         <module>annotation-processor</module>
         <module>performance</module>
         <module>cdi</module>
@@ -225,7 +224,7 @@
         <version.deploy.plugin>2.8.2</version.deploy.plugin>
         <version.enforcer.plugin>3.0.0-M1</version.enforcer.plugin>
         <version.forbiddenapis.plugin>3.2</version.forbiddenapis.plugin>
-        <version.gmavenplus.plugin>1.6</version.gmavenplus.plugin>
+        <version.gmavenplus.plugin>1.13.0</version.gmavenplus.plugin>
         <version.gpg.plugin>3.0.1</version.gpg.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
         <version.japicmp.plugin>0.11.0</version.japicmp.plugin>
@@ -324,7 +323,8 @@
         <arquillian.wildfly.jvm.args.add-opens></arquillian.wildfly.jvm.args.add-opens>
         <arquillian.wildfly.jvm.args.add-modules></arquillian.wildfly.jvm.args.add-modules>
         <arquillian.wildfly.jvm.args>-Duser.language=en ${arquillian.wildfly.jvm.args.add-opens} ${arquillian.wildfly.jvm.args.add-modules}</arquillian.wildfly.jvm.args>
-
+        <server.jvm.jpms.args>--add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.management/javax.management=ALL-UNNAMED --add-opens=java.naming/javax.naming=ALL-UNNAMED</server.jvm.jpms.args>
+        <client.jvm.jpms.args>--add-exports=java.desktop/sun.awt=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.security=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.management/javax.management=ALL-UNNAMED --add-opens=java.naming/javax.naming=ALL-UNNAMED</client.jvm.jpms.args>
         <!-- JDK version required for the build -->
         <jdk.min.version>17</jdk.min.version>
         <maven.min.version>3.3.1</maven.min.version>
@@ -550,7 +550,17 @@
                         <groupId>sun.jdk</groupId>
                         <artifactId>jconsole</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.wildfly.core</groupId>
+                        <artifactId>wildfly-launcher</artifactId>
+                    </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.wildfly.core</groupId>
+                <artifactId>wildfly-launcher</artifactId>
+                <version>19.0.0.Beta8</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jboss.arquillian.container</groupId>
@@ -889,7 +899,8 @@
                             <include>**/*Test.java</include>
                         </includes>
                         <jvm>${java-version.test.launcher}</jvm>
-                        <argLine>${surefire.jvm.args}</argLine>
+<!--                        <argLine>${surefire.jvm.args}</argLine>-->
+                        <argLine>-Dlauncher.skip.jpms.properties=true ${client.jvm.jpms.args} ${surefire.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
                         <environmentVariables>
                             <!-- Ensure Java programs launched in tests (Payara, WildFly)
@@ -933,7 +944,8 @@
                     <version>${version.failsafe.plugin}</version>
                     <configuration>
                         <jvm>${java-version.test.launcher}</jvm>
-                        <argLine>${failsafe.jvm.args}</argLine>
+<!--                        <argLine>${failsafe.jvm.args}</argLine>-->
+                        <argLine>-Dlauncher.skip.jpms.properties=true ${client.jvm.jpms.args} ${failsafe.jvm.args}</argLine>
                         <reportNameSuffix>${surefire.environment}</reportNameSuffix>
                         <environmentVariables>
                             <!-- Ensure Java programs launched in tests (Payara, WildFly)
@@ -1207,7 +1219,7 @@
                                             gmavenplus-plugin
                                         </artifactId>
                                         <versionRange>
-                                            [1.5,)
+                                            [1.13,)
                                         </versionRange>
                                         <goals>
                                             <goal>execute</goal>
@@ -1400,9 +1412,6 @@
                 </property>
             </activation>
             <properties>
-                <arquillian.wildfly.jvm.args.add-modules>
-                    --add-modules=java.se
-                </arquillian.wildfly.jvm.args.add-modules>
                 <!--
                 All these add-opens are probably not necessary for our WildFly usage but add the ones defined in
                 https://github.com/ctomc/wildfly/commit/d8c4f55a1f900d931c224049c8a118ba4a5bcb45 to be on the safe side.
@@ -1435,17 +1444,7 @@
                                     --add-opens=java.base/java.lang=ALL-UNNAMED
                                     --add-opens=java.base/java.security=ALL-UNNAMED
                                     --add-opens=java.base/java.io=ALL-UNNAMED
-                                    --add-modules=java.se
                                 </javaOpts>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jboss.as</groupId>
-                            <artifactId>patch-gen-maven-plugin</artifactId>
-                            <configuration>
-                                <argLine>
-                                    --add-modules=java.se
-                                </argLine>
                             </configuration>
                         </plugin>
                     </plugins>
