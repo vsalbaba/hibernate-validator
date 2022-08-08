@@ -9,7 +9,7 @@ package org.hibernate.validator.integration.cdi;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.integration.AbstractArquillianIT;

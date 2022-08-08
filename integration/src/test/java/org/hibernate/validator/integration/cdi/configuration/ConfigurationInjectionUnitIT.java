@@ -8,7 +8,7 @@ package org.hibernate.validator.integration.cdi.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 import jakarta.validation.ValidatorFactory;
 
 import org.hibernate.validator.cdi.HibernateValidator;
