@@ -587,11 +587,6 @@
                 <version>${version.com.fasterxml.jackson.core.jackson-annotations}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <version>${version.javax.inject}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
