@@ -25,8 +25,9 @@
 		<configuration>
 			<property name="jbossHome">${wildfly.target-dir}</property>
 			<!-- Java home is defined through an environment variable (see maven-failsafe-plugin config) -->
-			<property name="javaVmArguments">${arquillian.wildfly.jvm.args}
+			<property name="javaVmArguments">
 				-Xmx1024m ${remote.debug}
+				${server.jvm.jpms.args}
 				-Dvalidation.provider=${validation.provider}
 			</property>
 			<property name="allowConnectingToRunningServer">true</property>
